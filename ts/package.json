@@ -23,5 +23,8 @@
     "webpack": "^5.24.1",
     "webpack-cli": "^4.5.0",
     "zip-a-folder": "^0.0.12"
+  },
+  "dependencies": {
+    "python-shell": "^3.0.1"
   }
 }
