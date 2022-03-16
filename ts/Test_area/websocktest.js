@@ -4,7 +4,6 @@ let connection = new WebSocket("ws://192.168.1.13:4444");
 
 function main() {
     
-
     connection.onopen = function () {
         console.log('Connected!');
         connection.send('Ping'); // Send the message 'Ping' to the server
