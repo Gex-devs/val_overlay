@@ -35,3 +35,4 @@ Editing the author or app name in the manifest will prevent loading the app as u
 
 For any further information or questions, contact developers@overwolf.com
 # val_overlay_2
+# val_overlay_2
