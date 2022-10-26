@@ -34,3 +34,4 @@ You can load the native version of the sample app "as is", without any build pro
 Editing the author or app name in the manifest will prevent loading the app as unpacked app.
 
 For any further information or questions, contact developers@overwolf.com
+# val_overlay_2
