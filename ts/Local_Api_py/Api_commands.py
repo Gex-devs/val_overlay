@@ -68,3 +68,14 @@ def lock_agent(agent):
     response = requests.request("POST", url, data=payload, headers=headers)
     print(response.text)
 
+
+def dodge_game():
+
+    payload = ""
+
+    headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }
+
+    response = requests.request("POST", "/pregame/v1/matches/4124124/quit", payload, headers)

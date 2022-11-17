@@ -16,7 +16,7 @@ def Auth_Riot():
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     # endregion
     
-        CREDS = "Gexion1", "Temp@pass"
+        CREDS = "Lvl23Crook", "amanaman13"
 
         auth = riot_auth.RiotAuth()
         try:
