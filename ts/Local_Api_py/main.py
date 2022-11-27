@@ -1,33 +1,53 @@
-
+import sys
 import time
 from websocket import create_connection
-from Riot_AuthFlow import Auth_Riot
 import json
 import requests
 from Agents_id import *
 import Agents_id
+import os
 
-ws = create_connection("ws://192.168.1.22:4444")
+ws = create_connection(f"ws://{sys.argv[1]}:{sys.argv[2]}")
+#ws = create_connection("ws://192.168.1.22:4444")
 #ws = create_connection("ws://127.0.0.1:4444")
 #ws.send("man just relpy")
 
+requests.packages.urllib3.disable_warnings()
+
+#file_current = __file__[:-7]
+
+#f = open(rf'{file_current}Riot_Auth.json')
+
+LockFile = open(os.getenv('LOCALAPPDATA') + "\Riot Games\Riot Client\Config\lockfile","r")
+h = LockFile.read()
+LockFilePort = h.split(":")[2]
+
+url = f"https://127.0.0.1:{LockFilePort}/entitlements/v1/token"
+
+payload = ""
+headers = {"Authorization": "Basic cmlvdDo5VWU0dUV3NWhlS2hzZEUyQjJKNTBR"}
+
+response = requests.request("GET", url, data=payload, headers=headers,verify=False)
+
+j = json.loads(response.text)
+
+Entitlment = j["token"]
+Authorization = j["accessToken"]
+Player_ID = j["subject"]
 
 
 
+def changeQ():
+    url = "https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/ecd7825c-fa84-431a-9360-a2361403f4a3/queue"
 
+    payload = {"queueID": "onefa"}
 
+    headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }
 
-file_current = __file__[:-7]
-
-f = open(rf'{file_current}Riot_Auth.json')
-j = json.load(f)
-
-Entitlment = j["Riot_Auth"][0]["Entitlment_token"]
-Authorization = j["Riot_Auth"][0]['Acess_Token']
-Player_ID = j["Riot_Auth"][0]['PUUID']
-
-
-
+    response = requests.request("POST", url, json=payload, headers=headers)
 def prematch_id():
    
 
@@ -60,8 +80,6 @@ def dodge_game():
     print(response)
 
 def select(agent):
-
-    Auth_Riot()
 
     url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{prematch_id()}/select/{agent}"
 
@@ -212,6 +230,7 @@ def get_party():
 
     print(response.text)
 
+
 def start_q():
     url = "https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/c96e2e90-994a-4b11-9f61-2876e9b7aed9/matchmaking/join"
 
@@ -230,18 +249,17 @@ def stop_q():
     url = "https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/c96e2e90-994a-4b11-9f61-2876e9b7aed9/matchmaking/leave"
 
     payload = ""
-    headers = {
-    "X-Riot-Entitlements-JWT": "eyJraWQiOiJrMSIsImFsZyI6IlJTMjU2In0.eyJlbnRpdGxlbWVudHMiOltdLCJhdF9oYXNoIjoiOGRRZmN3Q01Ma2lyb3BVN3c4d0dzdyIsInN1YiI6IjZkYWZmM2JlLTkyZDgtNThjYi05ODZjLWU0YWI3MmI5NmE1YSIsImlzcyI6Imh0dHBzOlwvXC9lbnRpdGxlbWVudHMuYXV0aC5yaW90Z2FtZXMuY29tIiwiaWF0IjoxNjY3NDQyMDY0LCJqdGkiOiJ5WnF3c0VUQlliUSJ9.Thq4Jl1qhNnBMA7bySRs8QSgQXg04n3bSX2MLlnJSmR63VICp4a2F59ajjAiyf351YPlHPXIMWw4TUFA2ocHM99HX9EJoBHgcEQ3p-Ta7ol0WfdFLmJHVvNFBwn3e1rVAirTHJFe3YMPdwaSBNsKNPnpVn4wapuPjkLSehL7vZgKChvAh8mOP8AsLhd62RPaaJ1bkvrM6BZS_bz6mpuZ_V2gy9AxQ6pP-mSif1dAMRKKYJBdgnASaqoFhX4XptVZA-W17xgKVmq2WNxW8FAAUlwoMUyb9_mqZMW8WqSZdbYEzE2nbdxaKIX3cQUDmKCspLTNrlOvrgU_i5qEH-TFiw",
-    "Authorization": "Bearer eyJraWQiOiJzMSIsImFsZyI6IlJTMjU2In0.eyJwcCI6eyJjIjoiZXUifSwic3ViIjoiNmRhZmYzYmUtOTJkOC01OGNiLTk4NmMtZTRhYjcyYjk2YTVhIiwic2NwIjpbImFjY291bnQiLCJvcGVuaWQiXSwiY2xtIjpbImZlZGVyYXRlZF9pZGVudGl0eV9wcm92aWRlcnMiLCJlbWFpbF92ZXJpZmllZCIsIm9wZW5pZCIsInB3IiwicmduX0VVVzEiLCJwaG9uZV9udW1iZXJfdmVyaWZpZWQiLCJhY2N0X2dudCIsImxvY2FsZSIsImFjY3QiLCJhZ2UiLCJhY2NvdW50X3ZlcmlmaWVkIiwiYWZmaW5pdHkiXSwiZGF0Ijp7InAiOm51bGwsInIiOiJFVVcxIiwiYyI6ImVjMSIsInUiOjI1MDUzNjgzMzc2MzA3MjAsImxpZCI6IkxGYWZlSUl0MUZoOXYwenBIWUFwZ3cifSwiaXNzIjoiaHR0cHM6XC9cL2F1dGgucmlvdGdhbWVzLmNvbSIsImV4cCI6MTY2NzQ0NTY2MywiaWF0IjoxNjY3NDQyMDYzLCJqdGkiOiJ5WnF3c0VUQlliUSIsImNpZCI6InBsYXktdmFsb3JhbnQtd2ViLXByb2QifQ.X40gllEHkB-tqo69YjuXz_MDenMfHWeNUwmlhacXuGEiBKAVgSkzYSWuYZdwbuAqPnS6muvAM7co6yQ5kzRQpRNyLmXV6fOvtXawzuWsYjhwPJFTYC2-GjYe784LeejSa1xrJ83k6tzVw3Vtgot7LN1wZwOhq7GbUBkXh8Y6F5E"
-    }
+    header = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }   
 
-    response = requests.request("POST", url, data=payload, headers=headers)
+    response = requests.request("POST", url, data=payload, headers=header)
 
     print(response.text)
 
 
 while True:
-
     result =  ws.recv()
     print(result)
     if result == "get_map":

@@ -8,9 +8,10 @@ from Riot_AuthFlow import Auth_Riot
 
 Auth_Riot()
 
-file_current = __file__[:-15]
+#file_current = __file__[:-15]
 
-f = open(rf'{file_current}Riot_Auth.json')
+#f = open(rf'{file_current}Riot_Auth.json')
+f = open(r"C:\Users\dgexi\OneDrive\Documents\Code\Java_script\val_overlay\ts\Local_Api_py\Riot_Auth.json")
 j = json.load(f)
 
 Entitlment = j["Entitlment_token"]

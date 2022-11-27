@@ -1,12 +1,5 @@
 
-var x;
-function tt(){
-    x = "huh";
-}
 
-
-
-console.log(x)
-
-tt()
-
+fetch('http://example.com/movies.json')
+  .then((response) => response.json())
+  .then((data) => console.log(data));

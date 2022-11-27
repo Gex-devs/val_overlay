@@ -5,10 +5,11 @@ import riot_auth
 import time
 import ssl
 
-file_current = __file__[:-16]
+#file_current = __file__[:-16]
 
 def Auth_Riot():
-    f = open(rf'{file_current}Riot_Auth.json')
+    #f = open(rf'{file_current}Riot_Auth.json')
+    f = open(r"C:\Users\dgexi\OneDrive\Documents\Code\Java_script\val_overlay\ts\Local_Api_py\Riot_Auth.json")
     j = json.load(f)
     
     if time.time() - float(j["Riot_Auth"][0]["Time"]) > 3600:
@@ -30,7 +31,7 @@ def Auth_Riot():
             ssl._create_default_https_context = _create_unverified_https_context
     
         data = {'Riot_Auth':[{'Acess_Token': f'{auth.access_token}', 'Entitlment_token': f'{auth.entitlements_token}','PUUID':f'{auth.user_id}','Time':f'{time.time()}'}]} 
-        with open(f'{file_current}Riot_Auth.json', 'w') as outfile:
+        with open(r"C:\Users\dgexi\OneDrive\Documents\Code\Java_script\val_overlay\ts\Local_Api_py\Riot_Auth.json", 'w') as outfile:
             json.dump(data, outfile,indent=4)
     
    
