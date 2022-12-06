@@ -25,6 +25,7 @@
     "zip-a-folder": "^0.0.12"
   },
   "dependencies": {
+    "discovery": "^1.1.0",
     "python-shell": "^3.0.1"
   }
 }
