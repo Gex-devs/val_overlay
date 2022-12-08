@@ -1,3 +1,4 @@
+import socket
 import sys
 import time
 from websocket import create_connection
@@ -11,12 +12,15 @@ import base64
 import threading
 import logging
 from flask import Flask
+import asyncio
+import websockets.server
+from zeroconf import  ServiceInfo, Zeroconf
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 #ws = create_connection(f"ws://{sys.argv[1]}:{sys.argv[2]}")
-ws = create_connection("ws://192.168.1.22:4444")
-#ws = create_connection("ws://127.0.0.1:4444")
+#ws = create_connection("ws://192.168.1.22:4444")
+
 #ws.send("man just relpy")
 requests.packages.urllib3.disable_warnings()
 
@@ -42,14 +46,157 @@ headers = {"Authorization": f"Basic {base64_chat}"}
 
 response = requests.request("GET", url, data=payload, headers=headers,verify=False)
 
+
 j = json.loads(response.text)
+
+    
+
 Entitlment = j["token"]
 Authorization = j["accessToken"]
 Player_ID = j["subject"]
 
+connections = set()
+
+# Create an asyncio queue to store messages.
+message_queue = asyncio.Queue()
+
+async def echo(websocket, path):
+    # Add the websocket to the set of connections.
+    try:
+
+        connections.add(websocket)
+
+    # Start a task to send messages from the queue to the server.
+        #asyncio.create_task(send_messages(websocket, message_queue))
+        asyncio.create_task(request_json())
+        while True:
+            message = await websocket.recv()
+
+        #print messages
+            print(message)
+        # Send the message to all other connections.
+            for ws in connections:
+                if ws != websocket:
+                    await ws.send(message)
+    except websockets.exceptions.ConnectionClosed:
+        print("Connection closed by client")
+    except Exception as e:
+        print("Unexpected error:", e)
+
+# Send messages from the queue to the server.
+async def send_messages(websocket, message_queue):
+    while True:
+        message = await message_queue.get()
+        await websocket.send(message)
+async def broadcast_message(message):
+    for ws in connections:
+        await ws.send(message)
+
+
+
+async def request_json():
+    url = f"https://127.0.0.1:{LockFilePort}/chat/v6/messages"
+
+    querystring ={"cid":get_party_id()[0]}
+
+    payload = ""
+
+    headers = {"Authorization": f"Basic {base64_chat}"}
+
+    responses = requests.request("GET", url, data=payload, headers=headers, params=querystring,verify=False)
+
+    #print(response.text)
+
+    original_chat = responses.json()
+
+    url2 = "https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/"+get_party_id()[1]
+
+    payload2 = ""
+    headers2 = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }
+
+    responses2 = requests.request("GET", url2, data=payload2, headers=headers2,verify=False)
+
+    print(responses2.text)
+    
+    
+    await broadcast_message(responses2.text)
+
+    original_party = responses2.json()
+    while True:
+        # Request the JSON data from the URL.
+        live_querystring = {"cid":get_party_id()[0]}
+
+        response = requests.request("GET", url, data=payload, headers=headers, params=live_querystring,verify=False)
+
+        #print(response.text)
+
+        second_response = response.json()
+
+        f = jd.diff(original_chat,second_response,dump=True)
+
+        if(f!="{}"):
+            print("change was found")
+            print(f)
+            await broadcast_message(str(f))
+            original_chat = second_response
+
+
+        responses2_1 = requests.request("GET", url2, data=payload2, headers=headers2,verify=False)
+
+        original_party_second_response = responses2_1.json()
+        
+        party_data_json_diff = jd.diff(original_party,original_party_second_response,dump=True)
+        
+        if(party_data_json_diff!="{}"):
+            print(party_data_json_diff)
+            logging.info('change was found')
+            await broadcast_message(str(original_party_second_response))
+            logging.info("Sent Party JSON")
+            original_party = original_party_second_response
+
+        '''
+        response = requests.get("https://www.example.com/data.json")
+        #data = response.json()
+
+        # Convert the JSON data to a string and broadcast it to all clients.
+        #message = json.dumps(data)
+        await broadcast_message(message)
+           '''
+        # Wait for one second before requesting the JSON data again.
+        await asyncio.sleep(1)
+      
+# Start the websocket server in a separate thread.
+def start_server():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    # Start the request_json task.
+    
+    # Advertise the server using Bonjour.
+    service_info = ServiceInfo(
+    "_http._tcp.local.",
+    f"{get_username(Player_ID)}._http._tcp.local.",
+    address=socket.inet_aton("192.168.1.19"),
+    port=8765,
+    properties={},
+    server="my-web-socket.local.",
+    )
+
+# Create a Zeroconf object and register the service
+    zeroconf = Zeroconf()
+    zeroconf.register_service(service_info)
+    print("Server Started")
+    start_server = websockets.serve(echo, "0.0.0.0", 8765)
+    loop.run_until_complete(start_server)
+    loop.run_forever()
+
+
+
 def get_username(PUID):
     url = "https://pd.eu.a.pvp.net/name-service/v2/players"
-
+    
     payload = [f"{PUID}"]
     headers = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
@@ -93,7 +240,7 @@ def changeQ(qeue):
 
     response = requests.request("POST", url, json=payload, headers=headers,verify=False)
 
-    return response.status_code
+    return "ok"
 
 
 def prematch_id():
@@ -116,7 +263,7 @@ def prematch_id():
 def dodge_game():
 
     payload = ""
-    url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{pre_game_matchID()}/quit"
+    url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{prematch_id()}/quit"
     header = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
     "Authorization": f"Bearer {Authorization}"
@@ -127,7 +274,7 @@ def dodge_game():
     return response.status_code
 
 
-def select(agent):
+def select_agent(agent):
 
     url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{prematch_id()}/select/{agent}"
 
@@ -139,19 +286,13 @@ def select(agent):
 
     response = requests.request("POST", url, data=payload, headers=headers,verify=False)
     print(response.text)
+    return agent
 
 
 ## Not sure about the request...check later
 def lock_agent(agent):
-    
-    get_agent = getattr(Agents_id, agent)
 
-    selected_agent = get_agent()
-
-    print(selected_agent)
-
-
-    url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{prematch_id()}/lock/{selected_agent}"
+    url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{prematch_id()}/lock/{agent}"
     print(url)
 
     payload = ""
@@ -162,7 +303,7 @@ def lock_agent(agent):
 
     response = requests.request("POST", url, data=payload, headers=headers,verify=False)
 
-    print(response.text)
+    return response.status_code
 
 def party_accessibility(state):
 
@@ -179,76 +320,11 @@ def party_accessibility(state):
     
     return response.status_code
 
-print(response.text)
-def check_agent(Agent):
-    global current_agent
-    if Agent == "Jett":
-        select(jett())  ## Use this method instead and have a local variable to store the current selected agent for locking
-        current_agent = "jett"
-    elif Agent == "Omen":
-        select(omen())
-        current_agent = "omen"
-    elif Agent == "Raze":
-        select(raze())
-        current_agent = "raze"
-    elif Agent == "Sage":
-        current_agent = "sage"
-        select(sage())
-    elif Agent == "Reyna":
-        current_agent = "reyna"
-        select(reyna())
-    elif Agent == "Skye":
-        current_agent = "skye"
-        select(skye())
-
-    elif Agent == "Killjoy":
-        current_agent = "killjoy"
-        select(killjoy())  ## Use this method instead and have a local variable to store the current selected agent for locking
-    elif Agent == "Phx":
-        current_agent = "phx"
-        select(phx())
-    elif Agent == "Brimstone":
-        current_agent = "brimstone"
-        select("9f0d8ba9-4140-b941-57d3-a7ad57c6b417")
-    elif Agent == "Fade":
-        current_agent = "fade"
-        select(fade())
-    elif Agent == "Cypher":
-        current_agent = "cypher"
-        select(cypher())
-    elif Agent == "Viper":
-        current_agent = "viper"
-        select(viper())
-
-    elif Agent == "Kayo":
-        current_agent = "kayo"
-        select(kayo())  ## Use this method instead and have a local variable to store the current selected agent for locking
-    elif Agent == "Breach":
-        current_agent = "breach"
-        select(breach())
-    elif Agent == "Astra":
-        current_agent = "astra"
-        select(astra())
-    elif Agent == "Chamber":
-        current_agent = "chamber"
-        select(chamber())
-    elif Agent == "Neon":
-        current_agent = "neon"
-        select(neon())
-    elif Agent == "Sova":
-        current_agent = "sova"
-        select(sova())
-    elif Agent == "Lock":
-        print("Lock was detected")
-        lock_agent(current_agent)
-    elif Agent == "Dodge":
-        print("Dodge Game")
-        dodge_game()
 
 
 def get_map():
 
-    url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{pre_game_matchID()}"
+    url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{prematch_id()}"
     print(url)
     payload = ""
     header = {
@@ -264,30 +340,13 @@ def get_map():
     return jj['MapID']
 
 
-def pre_game_matchID():
-    payload = ""
-    url = "https://glz-eu-1.eu.a.pvp.net/pregame/v1/players/"
-    header = {
-    "X-Riot-Entitlements-JWT": f"{Entitlment}",
-    "Authorization": f"Bearer {Authorization}"
-    }   
-    response = requests.request("GET", f"{url}{Player_ID}", data=payload, headers=header)
-
-    jj = json.loads(response.text)
-    print("sucess")
-    try:
-        print(jj['MatchID'])
-        return jj['MatchID']
-    except KeyError:
-        print("Match ID not found")
-    
 def get_party_id():
     url = "https://glz-eu-1.eu.a.pvp.net/parties/v1/players/"+Player_ID
 
     payload = ""
     header = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
-    "X-Riot-ClientVersion": "release-05.10-11-796984",
+    "X-Riot-ClientVersion": "release-05.12-15-804337",
     "Authorization": f"Bearer {Authorization}"
     }   
 
@@ -344,81 +403,126 @@ def send_chat(text):
 
     return response.status_code
 
-   
-def polling_function():
-    url = f"https://127.0.0.1:{LockFilePort}/chat/v6/messages"
+def get_current_server_current_game():
+    
 
-    querystring ={"cid":get_party_id()[0]}
+    url = "https://glz-eu-1.eu.a.pvp.net/core-game/v1/matches/91181115-bfb5-40b3-841e-68fb5f12184b"
 
     payload = ""
-
-    headers = {"Authorization": f"Basic {base64_chat}"}
-
-    responses = requests.request("GET", url, data=payload, headers=headers, params=querystring,verify=False)
-
-    #print(response.text)
-
-    original_chat = responses.json()
-
-    url2 = "https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/"+get_party_id()[1]
-
-    payload2 = ""
-    headers2 = {
+    headers = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
     "Authorization": f"Bearer {Authorization}"
-    }
+    }   
 
-    responses2 = requests.request("GET", url2, data=payload2, headers=headers2,verify=False)
+    response = requests.request("GET", url, data=payload, headers=headers)
 
-    print(responses2.text)
+    if response.json()["GamePodID"] == "aresriot.aws-euc1-prod.eu-gp-frankfurt-1":
+        server = "FrankFurt"
+    elif response.json()["GamePodID"] == "aresriot.aws-apne1-prod.eu-gp-tokyo-1":
+        server = "Tokyo"
+    elif response.json()["GamePodID"] == "aresriot.aws-mes1-prod.eu-gp-bahrain-1":
+        server = "Bahrain"
+    elif response.json()["GamePodID"] == "aresriot.aws-rclusterprod-mad1-1.eu-gp-madrid-1":
+        server = "Madrid"
+    elif response.json()["GamePodID"] == "aresriot.aws-euw3-prod.eu-gp-paris-1":
+        server = "Paris"
+    elif response.json()["GamePodID"] == "aresriot.aws-eun1-prod.eu-gp-stockholm-1":
+        server = "Stockholm"
+    elif response.json()["GamePodID"] == "aresriot.mtl-riot-ist1-2.eu-gp-istanbul-1":
+        server = "Istanbul"
+    elif response.json()["GamePodID"] == "aresriot.aws-euw2-prod.eu-gp-london-1":
+        server = "London"
+    elif response.json()["GamePodID"] == "aresriot.aws-rclusterprod-waw1-1.eu-gp-warsaw-1":
+        server = "Warsaw"
 
-    ws.send(responses2.text)
-
-    original_party = responses2.json()
-
-    #print(responses2.text)
-
-    while True:
-
-        time.sleep(0.7)
-
-        live_querystring = {"cid":get_party_id()[0]}
-
-        response = requests.request("GET", url, data=payload, headers=headers, params=live_querystring,verify=False)
-
-        #print(response.text)
-
-        second_response = response.json()
-
-        f = jd.diff(original_chat,second_response,dump=True)
-
-        if(f!="{}"):
-            print(type(f))
-            print("change was found")
-            print(f)
-            ws.send(str(f))
-            original_chat = second_response
+    return server
 
 
-        responses2_1 = requests.request("GET", url2, data=payload2, headers=headers2,verify=False)
+def pregame_gamemode():
+    url = "https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/"+pre_game_matchID()
 
-        original_party_second_response = responses2_1.json()
+    payload = ""
+    headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }   
+
+    response = requests.request("GET", url, data=payload, headers=headers)
+
+    return response.json()["QueueID"]
+
+
+def get_current_server_pre_game():
+    
+    url = "https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/"+prematch_id()
+
+    payload = ""
+    headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }   
+
+    response = requests.request("GET", url, data=payload, headers=headers)
+
+    if response.json()["GamePodID"] == "aresriot.aws-euc1-prod.eu-gp-frankfurt-1":
+        server = "FrankFurt"
+    elif response.json()["GamePodID"] == "aresriot.aws-apne1-prod.eu-gp-tokyo-1":
+        server = "Tokyo"
+    elif response.json()["GamePodID"] == "aresriot.aws-mes1-prod.eu-gp-bahrain-1":
+        server = "bahrain"
+    elif response.json()["GamePodID"] == "aresriot.aws-rclusterprod-mad1-1.eu-gp-madrid-1":
+        server = "madrid"
+    elif response.json()["GamePodID"] == "aresriot.aws-euw3-prod.eu-gp-paris-1":
+        server = "paris"
+    elif response.json()["GamePodID"] == "aresriot.aws-eun1-prod.eu-gp-stockholm-1":
+        server = "stockholm"
+    elif response.json()["GamePodID"] == "aresriot.mtl-riot-ist1-2.eu-gp-istanbul-1":
+        server = "istanbul"
+    elif response.json()["GamePodID"] == "aresriot.aws-euw2-prod.eu-gp-london-1":
+        server = "london"
+    elif response.json()["GamePodID"] == "aresriot.aws-rclusterprod-waw1-1.eu-gp-warsaw-1":
+        server = "warsaw"
+
         
-        party_data_json_diff = jd.diff(original_party,original_party_second_response,dump=True)
-        
-        if(party_data_json_diff!="{}"):
-            print(party_data_json_diff)
-            logging.info('change was found')
-            ws.send(str(original_party_second_response))
-            logging.info("Sent Party JSON")
-            original_party = original_party_second_response
+    return server
 
-        continue
+def current_game_state():
+    
+    current_game_url = "https://glz-eu-1.eu.a.pvp.net/core-game/v1/players/"+Player_ID
+
+    current_game_payload = ""
+    current_game_headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }   
+
+    current_game_response = requests.request("GET", current_game_url, data=current_game_payload, headers=current_game_headers)
+
+    if(current_game_response.status_code == 200):
+        return "In_Game"
+
+    pre_game_url = "https://glz-eu-1.eu.a.pvp.net/pregame/v1/players/53f0e053-da42-5fe4-be34-326b738949a4"
+
+    pre_game_payload = ""
+    pre_game_headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }   
+
+    pre_game_response = requests.request("GET", pre_game_url, data=pre_game_payload, headers=pre_game_headers)
+
+    if(pre_game_response.status_code == 200):
+        return "Agent_sel"
+    
+    return "MainMenu"
 
 
 def Temp_Rest_Api():
     app = Flask(__name__) 
 
+    @app.route("/current_state")
+    def current_state():
+        return current_game_state()
     @app.route("/get_name/<puid>")
     def retrun_as_name(puid):
         return get_username(puid)
@@ -446,20 +550,29 @@ def Temp_Rest_Api():
     @app.route("/party/<status>")
     def open_or_close_party(status):
         return party_accessibility(status)
-
+    @app.route("/get_server/current_game")
+    def game_server_current():
+        return get_current_server_current_game()
+    @app.route("/get_server/pre_game")
+    def game_server_pre():
+        return get_current_server_pre_game()
+    @app.route("/get_gamemode/pre_game")
+    def game_state_pre():
+        return get_current_server_pre_game()
+    @app.route("/select_agent/<agent>")
+    def selection(agent):
+        return select_agent(agent)
+    @app.route("/lock_agent/<agent>")
+    def lockON(agent):
+        return lock_agent(agent)
+    
 
     app.run(host="0.0.0.0",port=7979)
 
 
 
 
-def main():
-    while True:
-        result =  ws.recv()
-        print(result)
-        if result == "get_map":
-            ws.send(get_map())
-        check_agent(result)
+
 
     
 
@@ -468,11 +581,10 @@ def main():
     
 
 
-t1 = threading.Thread(target=main)
-t2 = threading.Thread(target=polling_function)
+
 t3 = threading.Thread(target=Temp_Rest_Api)
+server_thread = threading.Thread(target=start_server)
 
-t1.start()
-t2.start()
+server_thread.start()
 t3.start()
- 
+server_thread.join()
