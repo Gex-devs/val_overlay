@@ -439,7 +439,7 @@ def get_current_server_current_game():
 
 
 def pregame_gamemode():
-    url = "https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/"+pre_game_matchID()
+    url = "https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/"+prematch_id()
 
     payload = ""
     headers = {
@@ -483,7 +483,6 @@ def get_current_server_pre_game():
     elif response.json()["GamePodID"] == "aresriot.aws-rclusterprod-waw1-1.eu-gp-warsaw-1":
         server = "warsaw"
 
-        
     return server
 
 def current_game_state():
@@ -558,6 +557,7 @@ def Temp_Rest_Api():
         return get_current_server_pre_game()
     @app.route("/get_gamemode/pre_game")
     def game_state_pre():
+        # fix this to get game mode
         return get_current_server_pre_game()
     @app.route("/select_agent/<agent>")
     def selection(agent):
