@@ -1,0 +1,101 @@
+/* screen - desktop-1 */
+
+.desktop-1 {
+  align-items: flex-start;
+  background-color: #1f252bcf;
+  border: 1px none;
+  display: flex;
+  flex-direction: column;
+  gap: 101px;
+  height: 1024px;
+  padding: 0 648px;
+  width: 1920px;
+}
+
+.desktop-1 .overlap-group1 {
+  align-items: flex-end;
+  background-image: url(../img/group-7@1x.svg);
+  background-size: 100% 100%;
+  display: flex;
+  height: 80px;
+  min-width: 623px;
+  padding: 14.0px 148.4px;
+}
+
+.desktop-1 .disconnected {
+  height: 47px;
+  width: 325px;
+}
+
+.desktop-1 .overlap-group {
+  align-items: flex-start;
+  align-self: flex-end;
+  background-image: url(../img/rectangle-21@1x.jpg);
+  background-size: 100% 100%;
+  display: flex;
+  flex-direction: column;
+  margin-right: 1px;
+  min-height: 341px;
+  padding: 26.5px 53px;
+  width: 619px;
+}
+
+.desktop-1 .ip-adress {
+  background-color: transparent;
+  border: 0;
+  color: var(--stack);
+  font-family: var(--font-family-inter);
+  font-size: var(--font-size-m);
+  font-weight: 500;
+  height: 27px;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-left: 9px;
+  margin-top: 33px;
+  padding: 0;
+  width: 193px;
+}
+
+.desktop-1 .ip-adress::placeholder {
+  color: #8e8e8e99;
+}
+
+.desktop-1 .line-11 {
+  height: 2px;
+  margin-top: 11px;
+  width: 512px;
+}
+
+.desktop-1 .port {
+  background-color: transparent;
+  border: 0;
+  color: var(--stack);
+  font-family: var(--font-family-inter);
+  font-size: var(--font-size-m);
+  font-weight: 500;
+  height: 28px;
+  letter-spacing: 0;
+  line-height: normal;
+  margin-left: 9px;
+  margin-top: 67px;
+  padding: 0;
+  width: 136px;
+}
+
+.desktop-1 .port::placeholder {
+  color: #8e8e8e99;
+}
+
+.desktop-1 .line-12 {
+  height: 2px;
+  margin-top: 13px;
+  width: 512px;
+}
+
+.desktop-1 .group-9 {
+  align-self: center;
+  height: 64px;
+  margin-right: 9.12px;
+  margin-top: 40px;
+  width: 68px;
+}

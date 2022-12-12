@@ -514,8 +514,35 @@ def current_game_state():
         return "Agent_sel"
     
     return "MainMenu"
+def get_current_game_id():
 
+    url = "https://glz-eu-1.eu.a.pvp.net/core-game/v1/players/"+Player_ID
 
+    payload = ""
+    headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }   
+
+    response = requests.request("GET", url, data=payload, headers=headers)
+
+    return response.json()["MatchID"]
+
+def get_current_players():
+    
+
+    url = "https://glz-eu-1.eu.a.pvp.net/core-game/v1/matches/"+get_current_game_id()
+
+    payload = ""
+    headers = {
+    "X-Riot-Entitlements-JWT": f"{Entitlment}",
+    "Authorization": f"Bearer {Authorization}"
+    }   
+
+    response = requests.request("GET", url, data=payload, headers=headers)
+
+    return response.json()
+    
 def Temp_Rest_Api():
     app = Flask(__name__) 
 
@@ -557,15 +584,16 @@ def Temp_Rest_Api():
         return get_current_server_pre_game()
     @app.route("/get_gamemode/pre_game")
     def game_state_pre():
-        # fix this to get game mode
-        return get_current_server_pre_game()
+        return pregame_gamemode()
     @app.route("/select_agent/<agent>")
     def selection(agent):
         return select_agent(agent)
     @app.route("/lock_agent/<agent>")
     def lockON(agent):
         return lock_agent(agent)
-    
+    @app.route("/current_game/players")
+    def get_players_Curr():
+        return get_current_players()
 
     app.run(host="0.0.0.0",port=7979)
 
