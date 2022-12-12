@@ -1,0 +1,22 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+:root {
+  --menu-speed: 0.2s;
+}
+body {
+  font-family: "Inter";
+  line-height: 1.4;
+   height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+main {
+  margin: 150px auto;
+  max-width: 728px;
+  padding: 2rem;
+  border-radius: 3px;
+  text-align: center;
+}

@@ -1,0 +1,146 @@
+.menu-wrap {
+  position: fixed;
+  top: 3vh;
+  left: 0;
+  z-index: 1;
+  user-select: none;
+}
+.menu-wrap .toggler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  height: 50px;
+  width: 50px;
+  cursor: pointer;
+  z-index: 2;
+}
+.menu-wrap .hamburger {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 60px;
+  width: 60px;
+  background: transparent;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* Hamburger line */
+.menu-wrap .hamburger > div {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(217, 217, 217, 1);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.4s;
+}
+
+/* Hamburger top & bottom line */
+.menu-wrap .hamburger > div:before,
+.menu-wrap .hamburger > div:after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 0;
+  background: inherit;
+  height: 2px;
+  width: 100%;
+  z-index: 1;
+}
+.menu-wrap .hamburger > div:after {
+  top: -10px;
+}
+
+/* Toggler Animation */
+.menu-wrap .toggler:checked + .hamburger > div {
+  transform: rotate(135deg);
+}
+.menu-wrap .toggler:checked + .hamburger > div:before,
+.menu-wrap .toggler:checked + .hamburger > div:after {
+  top: 0;
+  transform: rotate(90deg);
+}
+
+/* Rotate on hover when checked */
+.menu-wrap .toggler:checked:hover + .hamburger > div {
+  transform: rotate(225deg);
+}
+.menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(42, 48, 53, 1);
+  height: 100vh;
+  width: 0;
+  display: flex;
+  align-items: center;
+  padding-bottom: 60vh;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  transition: all var(--menu-speed) ease;
+}
+.menu > div {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 50%;
+  width: 100%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.4s ease-in;
+}
+.menu ul {
+  list-style: none;
+}
+.menu li {
+  padding: 1rem 0;
+}
+.menu > div a {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: var(--font-size-m);
+  color: rgba(217, 217, 217, 1);
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+.menu > div H1 {
+  font-family: var(--font-family-inter);
+  font-size: 29px;
+  color: rgba(217, 217, 217, 1);
+}
+
+.menu a:hover {
+  color: rgba(203, 97, 97, 1);
+  transition: color 0.3s ease-in;
+}
+
+/* Show Menu */
+.menu-wrap .toggler:checked ~ .menu {
+  opacity: 1;
+  width: 15vw;
+  transition: all var(--menu-speed) ease;
+}
+.menu-wrap .toggler:checked ~ .menu > div {
+  opacity: 1;
+  transition: opacity 0.4s ease-in;
+}
+.menu-wrap .toggler:checked ~ .menu > div a {
+  opacity: 1;
+  transition: opacity 1s ease-in;
+}

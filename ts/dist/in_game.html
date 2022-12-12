@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="./css/general.css" />
+  <link rel="stylesheet" href="./css/header.css" />
+  <link rel="stylesheet" href="./css/ingame.css" />
+  <link rel="stylesheet" href="./css/modal.css" />
+  <!--<link rel="stylesheet" href="./css/frame-2.css" />
+  <link rel="stylesheet" href="./css/globals.css" />
+  <link rel="stylesheet" href="./css/styleguide.css" />-->
+  <title>Overwolf Sample App - In-Game page</title>
+<script defer src="js/in_game.js"></script></head>
+<body class="in-game">
+  <!-- -------------------------------- Header ------------------------------- -->
+
+  <header id="header" class="app-header">
+    <img src="./img/valorant.png" width="40px" height="30px"/>
+    <h1>Riot_Take_A_Shit</h1>
+    <h1 class="hotkey-text">
+      Show/Hide Hotkey:
+      <kbd id="hotkey"></kbd>
+    </h1>
+    <div class="window-controls-group">
+      <button id="minimizeButton" class="window-control window-control-minimize" />
+      <button id="maximizeButton" class="window-control window-control-maximize" />
+      <button id="closeButton" class="window-control window-control-close" />
+    </div>
+  </header>
+
+  <!-- --------------------------------- Main -------------------------------- -->
+ <head>
+    <meta charset="utf-8" />   
+    <!--<meta name=description content="This site was generated with Anima. www.animaapp.com"/>-->
+    <!-- <link rel="shortcut icon" type=image/png href="https://animaproject.s3.amazonaws.com/home/favicon.png" /> -->
+    <meta name="viewport" content="width=2976, maximum-scale=1.0" />
+    <link rel="shortcut icon" type="image/png" href="https://animaproject.s3.amazonaws.com/home/favicon.png" />
+    <meta name="og:type" content="website" />
+    <meta name="twitter:card" content="photo" />
+    <link rel="stylesheet" type="text/css" href="css/frame-2.css" />
+    <link rel="stylesheet" type="text/css" href="css/styleguide.css" />
+    <link rel="stylesheet" type="text/css" href="css/globals.css" />
+    <link rel="stylesheet" type="text/css" href="css/desktop-1.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/menu.css" />
+  </head>
+  <body style="margin: 0">
+    <input type="hidden" id="anPageName" name="page" value="desktop-1" />
+    <div class="container-center-horizontal">
+      <div class="desktop-1 screen">
+        <div class="overlap-group1" id="connection_status"><img class="disconnected" src="img/disconnected@1x.jpg" alt="Disconnected" id="disconnected"/></div>
+        <div class="overlap-group" id="input_container">
+          <img class="group-20" src="img/group-9@2x.svg" alt="Group 9" id="Submit_button" />
+        </div>
+      </div>
+    </div>
+  </body>
+  <main>
+    <div id="logs">
+      <div id="events" class="logColumn">
+        <h1>Game Events</h1>
+        <div id="eventsLog" class="dataText">
+        </div>
+      </div>
+      <div id="infoUpdates" class="logColumn">
+        <h1>Info Updates</h1>
+        <div id="infoLog" class="dataText"></div>
+      </div>
+      <div id="infoUpdates" class="logColumn">
+        <h1>Me Updates</h1>
+        <div id="MeLog" class="dataText"></div>
+      </div>
+    <form action="/action_page.php">
+      <label for="fname">IP:Port</label>
+      <input type="text" id="fname" name="fname"><br><br>
+      <input type="text" id="Lname" name="Lname"><br><br>
+      <button type="button" id="meboss">connect</button>  
+    </form>
+  </main>
+  <script src="js/overwolfplugin.js"></script>
+  <script> 
+  var boss = document.getElementsByClassName('group-20')[0]
+  boss.addEventListener('mouseover',event =>{
+    boss.setAttribute('src','img/group-9@2x copy.svg')
+  })
+  boss.addEventListener('mouseout',event =>{
+    boss.setAttribute('src','img/group-9@2x.svg')
+  })
+  boss.addEventListener('mousedown',event =>{
+    boss.setAttribute('src','img/group-9@2x copy 2.svg')
+  })
+  boss.addEventListener('mouseup',event =>{
+    boss.setAttribute('src','img/group-9@2x copy.svg')
+  })
+  </script>
+</body>
+</html>
