@@ -1,12 +1,10 @@
 import requests
 import json
 import Agents_id
-from Riot_AuthFlow import Auth_Riot
+
 
 
 ## Theortically this should work
-
-Auth_Riot()
 
 #file_current = __file__[:-15]
 
