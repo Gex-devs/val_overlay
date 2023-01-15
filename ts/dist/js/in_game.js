@@ -468,16 +468,9 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                         const closeButton = document.getElementById('closeButton');
                         const maximizeButton = document.getElementById('maximizeButton');
                         const minimizeButton = document.getElementById('minimizeButton');
-                        const connect_button = document.getElementById('Submit_button');
                         const header = document.getElementById('header');
                         this.setDrag(header);
                         const yo_btn = document.getElementById('meboss');
-                        connect_button.addEventListener('click',() => {
-                            var ul = document.getElementById("mySelects");
-                            this.create_phone_socket("192.168.1.19","8765");
-                            
-                        });
-                        
                         /*connect_button.addEventListener('click',() => {
                             let IP_addr = document.getElementById('ip_input').value;
                             let port_addr = document.getElementById('port_input').value;
@@ -618,10 +611,16 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     }, gameFeatures);
                     this._gameEventsListener.start();
                 }
-
+                console.log("what tf")
+                this.create_phone_socket("localhost","8765");
+                overwolf.utils.isMouseLeftButtonPressed = function(e){
+                    console.log("here i am")
+                    console.log(e)
+                }
             }
             
             create_phone_socket(IP,PORT){
+                console.log("attempted http Request");
                 console.log("i have been called, socket connection");
                 console.log("before");
                 let IP_REAL = IP;
@@ -633,7 +632,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     }
                     
                     // fix path when you complie the python file
-                    const path = "C:\\Users\\dgexi\\OneDrive\\Documents\\Code\\Java_script\\val_overlay\\ts\\Local_Api_py\\dist\\main.exe";
+                    const path = "C:\\Users\\dgexi\\OneDrive\\Documents\\Code\\Java_script\\val_overlay\\ts\\dist\\Local_Api_py\\dist\\main.exe";
                     const args = "";
                     const environmentVariables = { };
                   
@@ -672,7 +671,6 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                       if (data) {
                         _processId = data;
                         console.log(_processId)
-                        this.logLine(this.MeLog,_processId,true);
                       }
                     });
                     //plugin.get().suspendProcess(processId,console.log)
@@ -684,17 +682,20 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                 
                 console.log("after");
                 connection.onopen = function(){
-                    console.log("Connected to Local Server");
-                    connection.send("connected?");
-                    document.getElementById('input_container').style.visibility = "hidden";
-                    document.getElementById('disconnected').src="img/hosted.png"
-                    
+                    console.log("Connected: Local Servers");
+                    connection.send("connected?Yes");
                 };
                 connection.onmessage = function (e){
                     console.log(e);
-                    if(e.data == "from phone"){
+                    if(e.data == "from_phone"){
                         document.getElementById("connection_status").className="overlap-group2";
                         document.getElementById('disconnected').src="img/Connected.png"
+                        document.getElementById('input_container').style.visibility = "invisible";
+                    }
+                    if(e.data == "phone_left"){
+                        document.getElementById("connection_status").className="overlap-group1";
+                        document.getElementById('input_container').style.visibility = "visible";
+                        document.getElementById('disconnected').src="img/disconnected@1x.jpg"
                     }
                 }; 
                 connection.onclose = function(event){
@@ -702,10 +703,6 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                         console.log("The connection was closed unexpectedly. Attempting to reconnect...");
                         ws.reconnect();
                     }
-                    console.log("WebSocket closed: " + event.code + " - " + event.reason + "i ccc");
-                    document.getElementById("connection_status").className="overlap-group1";
-                    document.getElementById('input_container').style.visibility = "visible";
-                    document.getElementById('disconnected').src="img/disconnected@1x.jpg"
                 }               
                 connection.onerror = function(e){
                     console.log(e)
@@ -733,6 +730,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     if (info.game_info.scene === "CharacterSelectPersistentLevel") {
                         this.logLine(this.MeLog, "Agent Select", true);
                         connection.send("CharacterSelectPersistentLevel");
+                        
                     } else if (info.game_info.scene === "MainMenu") {
                         this.logLine(this.MeLog, "Menu", true);
                         connection.send("MainMenu");

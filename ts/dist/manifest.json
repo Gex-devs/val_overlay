@@ -16,7 +16,8 @@
   "permissions": [
     "Hotkeys",
     "GameInfo",
-    "Extensions"
+    "Extensions",
+    "Web"
   ],
   "data": {
     "start_window": "background",
