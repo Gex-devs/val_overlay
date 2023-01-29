@@ -1,156 +1,30 @@
-import jsondiff as jd
-import json
 
-g = {
-	"messages": [
-		{
-			"body": "halo",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574397698:1",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574397698:1",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574398945",
-			"type": "groupchat"
-		},
-		{
-			"body": "help",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574404945:2",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574404945:2",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574406301",
-			"type": "groupchat"
-		},
-		{
-			"body": "maybe now?",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574489807:3",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574489807:3",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574491102",
-			"type": "groupchat"
-		},
-		{
-			"body": "why",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574564813:4",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574564813:4",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574566196",
-			"type": "groupchat"
-		}
-	]
-}
-
-h = {
-	"messages": [
-		{
-			"body": "halo",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574397698:1",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574397698:1",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574398945",
-			"type": "groupchat"
-		},
-		{
-			"body": "help",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574404945:2",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574404945:2",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574406301",
-			"type": "groupchat"
-		},
-		{
-			"body": "maybe now?",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574489807:3",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574489807:3",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574491102",
-			"type": "groupchat"
-		},
-		{
-			"body": "why",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574564813:4",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574564813:4",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574566196",
-			"type": "groupchat"
-		},
-		{
-			"body": "s",
-			"cid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net",
-			"game_name": "WatchFlankBro",
-			"game_tag": "yoma",
-			"id": "1669574638684:5",
-			"mid": "0ad005ea-a150-4db7-8e1a-6209bedf473a@ares-parties.eu2.pvp.net:53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net:1669574638684:5",
-			"name": "",
-			"pid": "53f0e053-da42-5fe4-be34-326b738949a4@ru1.pvp.net",
-			"puuid": "53f0e053-da42-5fe4-be34-326b738949a4",
-			"read": "true",
-			"region": "ru1",
-			"time": "1669574640070",
-			"type": "groupchat"
-		}
-	]
-}
-
-f = jd.diff(g, h)
+import os,requests,base64,json
 
 
-print(f)
 
-if(f == {}):
-    print("mtsm")
+LockFile = open(os.getenv('LOCALAPPDATA') + "\Riot Games\Riot Client\Config\lockfile","r")
+h = LockFile.read()
+LockFilePort = h.split(":")[2]
+LockFilePassword = h.split(":")[3]
 
+message = "riot:"+LockFilePassword
+message_bytes = message.encode('ascii')
+base64_bytes = base64.b64encode(message_bytes)
+base64_chat = base64_bytes.decode('ascii')
+
+
+url = f"https://127.0.0.1:{LockFilePort}/entitlements/v1/token"
+
+payload = ""
+headers = {"Authorization": f"Basic {base64_chat}"}
+
+response = requests.request("GET", url, data=payload, headers=headers,verify=False)
+
+
+j = json.loads(response.text)
+
+    
+
+Entitlment = j["token"]
+Authorization = j["accessToken"]

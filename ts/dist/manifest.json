@@ -7,9 +7,9 @@
     "version": "1.0",
     "minimum-overwolf-version": "0.160.0",
     "description": "Valorant Mobile Support",
-    "dock_button_title": "Gex Sample app",
-    "icon": "icons/IconMouseOver.png",
-    "icon_gray": "icons/IconMouseNormal.png",
+    "dock_button_title": "Valo-Companion",
+    "icon": "assets/IconMouseOver.png",
+    "icon_gray": "assets/IconMouseNormal.png",
     "launcher_icon": "icons/desktop-icon.ico",
     "window_icon": "icons/IconMouseOver.png"
   },
@@ -17,7 +17,8 @@
     "Hotkeys",
     "GameInfo",
     "Extensions",
-    "Web"
+    "Web",
+    "FileSystem"
   ],
   "data": {
     "start_window": "background",

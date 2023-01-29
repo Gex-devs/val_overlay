@@ -14,15 +14,16 @@ import asyncio
 import websockets.server
 from zeroconf import  ServiceInfo, Zeroconf
 import clr
-clr.AddReference(r"C:\Users\dgexi\OneDrive\Documents\Code\Java_script\val_overlay\ts\dist\Custom_dll\Gex_QR_Gen.dll")
+
 
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 # DLL files
+clr.AddReference(r"C:\Users\dgexi\OneDrive\Documents\Code\Java_script\val_overlay\ts\dist\Custom_dll\Gex_QR_Gen.dll")
 from Gex_QR_Gen import Program
 Gex_QR = Program()
-
+logging.info("DLL files Loaded")
 
 
 #ws = create_connection(f"ws://{sys.argv[1]}:{sys.argv[2]}")
@@ -51,8 +52,12 @@ url = f"https://127.0.0.1:{LockFilePort}/entitlements/v1/token"
 payload = ""
 headers = {"Authorization": f"Basic {base64_chat}"}
 
-response = requests.request("GET", url, data=payload, headers=headers,verify=False)
+try:
+    response = requests.request("GET", url, data=payload, headers=headers,verify=False)
+except Exception:
+    logging.error("Token Request Failed")
 
+logging.info("tokens requested")
 
 j = json.loads(response.text)
 
@@ -87,7 +92,7 @@ async def echo(websocket, path):
                     await broadcast_message(message)
         
     except websockets.exceptions.ConnectionClosed:
-        print("Connection closed by client")
+        logging.info("Connection closed by client")
         connections.remove(websocket)
         await broadcast_message("phone_left")
     except Exception as e:
@@ -208,24 +213,20 @@ def start_server():
 # Create a Zeroconf object and register the service
     zeroconf = Zeroconf()
     zeroconf.register_service(service_info)
-    logging.info("Server Started")
+    logging.info("Advertised websocket server")
     start_server = websockets.serve(echo, "0.0.0.0", 8765,ping_interval=None)
+    logging.info("Server Started")
     loop.run_until_complete(start_server)
     loop.run_forever()
 
 def get_party():
-
-
     url = "https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/"+get_party_id()[1]
-
     payload = ""
     headers = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
     "Authorization": f"Bearer {Authorization}"
     }
-
     response = requests.request("GET", url, data=payload, headers=headers)
-
     return response.json()
 
 def get_username(PUID):
@@ -257,16 +258,15 @@ def leave_party():
 
     response = requests.request("DELETE", url, data=payload, headers=headers)
 
-    return response.status_code
+    return str(response.status_code)
 
 
 
 
 def changeQ(qeue):
+    logging.info("Qeue Change Requested")
     url = f"https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/{get_party_id()[1]}/queue"
-
     payload = {"queueID": qeue}
-
     headers = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
     "Authorization": f"Bearer {Authorization}"
@@ -274,7 +274,7 @@ def changeQ(qeue):
 
     response = requests.request("POST", url, json=payload, headers=headers,verify=False)
 
-    return "ok"
+    return str(response.status_code)
 
 
 def prematch_id():
@@ -320,15 +320,14 @@ def select_agent(agent):
 
     response = requests.request("POST", url, data=payload, headers=headers,verify=False)
     print(response.text)
+    logging.info("Selected Agent: "+agent)
     return agent
 
 
-## Not sure about the request...check later
+## Get current selected Agent from the premade json not from The phone
 def lock_agent(agent):
 
     url = f"https://glz-eu-1.eu.a.pvp.net/pregame/v1/matches/{prematch_id()}/lock/{agent}"
-    print(url)
-
     payload = ""
     headers = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
@@ -336,6 +335,8 @@ def lock_agent(agent):
     }
 
     response = requests.request("POST", url, data=payload, headers=headers,verify=False)
+
+    logging.info("Locked Agent: "+agent)
 
     return str(response.status_code)
 
@@ -392,8 +393,8 @@ def get_party_id():
 
 
 def start_q():
+    logging.info("Qeue Start Requested")
     url = f"https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/{get_party_id()[1]}/matchmaking/join"
-
     payload = ""
     header = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
@@ -406,6 +407,7 @@ def start_q():
 
 
 def stop_q():
+    logging.info("Qeue Stop Requested")
     url = f"https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/{get_party_id()[1]}/matchmaking/leave"
 
     payload = ""
@@ -432,9 +434,11 @@ def send_chat(text):
     "Content-Type": "application/json",
     "Authorization": f"Basic {base64_chat}"
     }
-
-    response = requests.request("POST", url, json=payload, headers=headers,verify=False)
-
+    try:
+        response = requests.request("POST", url, json=payload, headers=headers,verify=False)
+    except Exception:
+        logging.error("Sent message failed")
+    
     return response.status_code
 
 def get_current_server_current_game():
@@ -548,6 +552,7 @@ def current_game_state():
         return "Agent_sel"
     
     return "MainMenu"
+
 def get_current_game_id():
 
     url = "https://glz-eu-1.eu.a.pvp.net/core-game/v1/players/"+Player_ID

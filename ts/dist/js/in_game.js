@@ -611,18 +611,17 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     }, gameFeatures);
                     this._gameEventsListener.start();
                 }
-                console.log("what tf")
                 this.create_phone_socket("localhost","8765");
-                overwolf.utils.isMouseLeftButtonPressed = function(e){
-                    console.log("here i am")
-                    console.log(e)
-                }
             }
             
             create_phone_socket(IP,PORT){
                 console.log("attempted http Request");
                 console.log("i have been called, socket connection");
-                console.log("before");
+                let curreLoco = window.location.href;
+                let extracted = curreLoco.split('://')[1].split('/in_game.html')[0];
+                console.log(extracted);
+                console.log(overwolf.io.paths.localAppData + "/overwolf/extensions/"+extracted+"/1.0")
+                overwolf.io.dir(overwolf.io.paths.localAppData + "\\overwolf\\extensions\\"+extracted+"\\1.0",console.log)
                 let IP_REAL = IP;
                 let PORT_REAL = PORT;
                 plugin.initialize(status => {
@@ -730,7 +729,6 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     if (info.game_info.scene === "CharacterSelectPersistentLevel") {
                         this.logLine(this.MeLog, "Agent Select", true);
                         connection.send("CharacterSelectPersistentLevel");
-                        
                     } else if (info.game_info.scene === "MainMenu") {
                         this.logLine(this.MeLog, "Menu", true);
                         connection.send("MainMenu");
@@ -839,13 +837,30 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     */
                    if(event.name == "kill"){
                         this.logLine(this.MeLog,"You killed",true)
-                        connection.send("kill");
+                        console.log("Kill");
+                        try {
+                            connection.send("kill");
+                        } catch (error) {
+                            
+                        }
                    }else if(event.name == "match_start"){
                         this.logLine(this.MeLog,"match started",true)
-                        connection.send("Started");
+                        console.log("Match_Start");
+                        try {
+                            connection.send("Started");
+                        } catch (error) {
+                            
+                        }
+                       
                    }else if(event.name == "match_end"){
-                        this.logLine(this.MeLog,"Match has ended")
-                        connection.send("match end")
+                        this.logLine(this.MeLog,"Match has ended");
+                        console.log("Match Ended");
+                        try {
+                            connection.send("match end");
+                        } catch (error) {
+                            
+                        }
+                        
                    }
                 });
                 //this.logLine(this._eventsLog, e, shouldHighlight);
@@ -889,9 +904,6 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
             async getCurrentGameClassId() {
                 const info = await overwolf_api_ts_1.OWGames.getRunningGameInfo();
                 return (info && info.isRunning && info.classId) ? info.classId : null;
-            }
-            test_func() {
-                this.logLine(this.MeLog, "function works", true);
             }
         }
 
