@@ -35,7 +35,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./node_modules/@overwolf/overwolf-api-ts/dist/ow-game-listener.js":
 /*!*************************************************************************!*\
@@ -92,7 +92,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./node_modules/@overwolf/overwolf-api-ts/dist/ow-games-events.js":
 /*!************************************************************************!*\
@@ -164,7 +164,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./node_modules/@overwolf/overwolf-api-ts/dist/ow-games.js":
 /*!*****************************************************************!*\
@@ -205,7 +205,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./node_modules/@overwolf/overwolf-api-ts/dist/ow-hotkeys.js":
 /*!*******************************************************************!*\
@@ -245,7 +245,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./node_modules/@overwolf/overwolf-api-ts/dist/ow-listener.js":
 /*!********************************************************************!*\
@@ -268,7 +268,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./node_modules/@overwolf/overwolf-api-ts/dist/ow-window.js":
 /*!******************************************************************!*\
@@ -406,7 +406,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./node_modules/@overwolf/overwolf-api-ts/dist/timer.js":
 /*!**************************************************************!*\
@@ -448,7 +448,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 /***/ "./src/AppWindow.ts":
 /*!**************************!*\
@@ -503,7 +503,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-}),
+            }),
 
 
 /***/ "./src/consts.ts":
@@ -538,10 +538,10 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 
 
                 /***/
-})
+            })
 
         /******/
-});
+    });
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
@@ -552,14 +552,14 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 /******/ 		if (__webpack_module_cache__[moduleId]) {
 /******/ 			return __webpack_module_cache__[moduleId].exports;
             /******/
-}
+        }
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
 /******/ 			// no module.id needed
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
             /******/
-};
+        };
 /******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
@@ -567,7 +567,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
         /******/
-}
+    }
     /******/
     /************************************************************************/
     var __webpack_exports__ = {};
@@ -611,104 +611,132 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     }, gameFeatures);
                     this._gameEventsListener.start();
                 }
-                this.create_phone_socket("localhost","8765");
+                //this.create_phone_socket("localhost", "8765");
+                this.check_for_backend();
             }
+
             
-            create_phone_socket(IP,PORT){
+            check_for_backend(){
+                let curreLoco = window.location.href;
+                let uuid = curreLoco.split('://')[1].split('/in_game.html')[0];
+                overwolf.io.fileExists(overwolf.io.paths.localAppData + "\\overwolf\\extensions\\" + uuid + "\\1.0\\Local_Api_py\\dist\\main.exe",data =>{
+                    if (data.found == false) {
+                        console.log(data.found);
+                        overwolf.utils.openFilePicker("Pick Main.exe",data =>{
+                            this.create_phone_socket("localhost","8765",data.file);
+                        })
+                    } else {
+                        
+                    }
+                })
+            }
+
+            create_phone_socket(IP, PORT,Exe_path) {
                 console.log("attempted http Request");
                 console.log("i have been called, socket connection");
                 let curreLoco = window.location.href;
-                let extracted = curreLoco.split('://')[1].split('/in_game.html')[0];
-                console.log(extracted);
-                console.log(overwolf.io.paths.localAppData + "/overwolf/extensions/"+extracted+"/1.0")
-                overwolf.io.dir(overwolf.io.paths.localAppData + "\\overwolf\\extensions\\"+extracted+"\\1.0",console.log)
+                console.log(curreLoco)
+                overwolf.io.fileExists(curreLoco,console.log)
+                let uuid = curreLoco.split('://')[1].split('/in_game.html')[0];
+                console.log(uuid);
+                let absolute_path = overwolf.io.paths.localAppData + "\\overwolf\\extensions\\" + uuid + "\\1.0\\Local_Api_py\\dist\\main.exe"
+                console.log(overwolf.io.paths.localAppData + "\\overwolf\\extensions\\" + uuid + "\\1.0\\Local_Api_py\\dist\\main.exe")
+                //overwolf.io.dir(overwolf.io.paths.localAppData + "\\overwolf\\extensions\\" + extracted + "\\1.0", console.log)
                 let IP_REAL = IP;
                 let PORT_REAL = PORT;
                 plugin.initialize(status => {
                     if (status == false) {
-                        this.logLine(this.MeLog,"Doesn't load plugin",true);
-                      return;
+                        this.logLine(this.MeLog, "Doesn't load plugin", true);
+                        return;
                     }
-                    
+
                     // fix path when you complie the python file
-                    const path = "C:\\Users\\dgexi\\OneDrive\\Documents\\Code\\Java_script\\val_overlay\\ts\\dist\\Local_Api_py\\dist\\main.exe";
+                    const path = overwolf.io.paths.localAppData + "\\overwolf\\extensions\\" + uuid + "\\1.0\\Local_Api_py\\dist\\main.exe";
                     const args = "";
-                    const environmentVariables = { };
-                  
+                    const environmentVariables = {};
+
                     const hidden = true;
-                  
+
+
                     
                     plugin.get().onDataReceivedEvent.addListener(({ error, data }) => {
-                      if (error) {
-                        console.error(error);
-                      }
-                  
-                      if (data) {
-                        console.log(data);
-                      }
+                        if (error) {
+                            console.error(error);
+                        }
+
+                        if (data) {
+                            console.log(data);
+                        }
                     });
-                  
+
                     let _processId = -1;
-                    plugin.get().onProcessExited.addListener(({processId, exitCode}) => {
-                      console.log(`process exit - pid=${processId} exitCode=${exitCode}`);
-                      if (_processId == processId) {
-                        processId = -1;
-                      }
+                    plugin.get().onProcessExited.addListener(({ processId, exitCode }) => {
+                        console.log(`process exit - pid=${processId} exitCode=${exitCode}`);
+                        if (_processId == processId) {
+                            processId = -1;
+                        }
                     });
-                  
-                    plugin.get().launchProcess(path, 
-                                               args, 
-                                               JSON.stringify(environmentVariables), 
-                                               hidden, 
-                                               true,
-                                               ({ error, data }) => {
-                      if (error) {
-                        console.log(error);
-                        this.logLine(this.MeLog,error,true);
-                      }
-                  
-                      if (data) {
-                        _processId = data;
-                        console.log(_processId)
-                      }
-                    });
+                    
+                    try {
+                        plugin.get().launchProcess(Exe_path,
+                            args,
+                            JSON.stringify(environmentVariables),
+                            hidden,
+                            true,
+                            ({ error, data }) => {
+                                if (error) {
+                                    console.log(error);
+                                    this.logLine(this.MeLog, error, true);
+                                }
+
+                                if (data) {
+                                    _processId = data;
+                                    console.log(_processId)
+                                }
+                            });
+                    } catch (error) {
+                        console.log(error)
+                        overwolf.utils.openFilePicker("Pick the main.exe",console.log);
+
+                    }
+
                     //plugin.get().suspendProcess(processId,console.log)
                     //plugin.get().resumeProcess(processId,console.log)
                     //plugin.get().terminateProcess(processId)
-                   });
-                
+                });
+
                 connection = new WebSocket(`ws://${IP_REAL}:${PORT_REAL}`);;
-                
+
                 console.log("after");
-                connection.onopen = function(){
+                connection.onopen = function () {
                     console.log("Connected: Local Servers");
                     connection.send("connected?Yes");
                 };
-                connection.onmessage = function (e){
+                connection.onmessage = function (e) {
                     console.log(e);
-                    if(e.data == "from_phone"){
-                        document.getElementById("connection_status").className="overlap-group2";
-                        document.getElementById('disconnected').src="img/Connected.png"
+                    if (e.data == "from_phone") {
+                        document.getElementById("connection_status").className = "overlap-group2";
+                        document.getElementById('disconnected').src = "img/Connected.png"
                         document.getElementById('input_container').style.visibility = "invisible";
                     }
-                    if(e.data == "phone_left"){
-                        document.getElementById("connection_status").className="overlap-group1";
+                    if (e.data == "phone_left") {
+                        document.getElementById("connection_status").className = "overlap-group1";
                         document.getElementById('input_container').style.visibility = "visible";
-                        document.getElementById('disconnected').src="img/disconnected@1x.jpg"
+                        document.getElementById('disconnected').src = "img/disconnected@1x.jpg"
                     }
-                }; 
-                connection.onclose = function(event){
+                };
+                connection.onclose = function (event) {
                     if (event.code === 1000) {
                         console.log("The connection was closed unexpectedly. Attempting to reconnect...");
                         ws.reconnect();
                     }
-                }               
-                connection.onerror = function(e){
+                }
+                connection.onerror = function (e) {
                     console.log(e)
                 }
             };
 
-            
+
 
             onInfoUpdates(info) {
                 //this.logLine(this._infoLog, info, true);
@@ -723,7 +751,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     this.logLine(this.MeLog, "Not match info", true)
                     //console.log(error)
                 }
-                
+
                 try {
                     // It is sending json Objects, Maybe convert to string 
                     if (info.game_info.scene === "CharacterSelectPersistentLevel") {
@@ -741,18 +769,18 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                         connection.send(info_to_string)
                     } else if (info.match_info.round_phase == "game_start") {
                         this.logLine(this.MeLog, "game_start", true)
-                        
+
                     }
                     //this.logLine(this.MeLog,"info sent",true)
                 } catch (error) {
                     //console.log(error)
                 }
-                
+
             }
 
             //test fun
-            
-            
+
+
 
             /* Phone Websocket
             Send_to_client() {
@@ -835,33 +863,33 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                     }
                     return false;
                     */
-                   if(event.name == "kill"){
-                        this.logLine(this.MeLog,"You killed",true)
+                    if (event.name == "kill") {
+                        this.logLine(this.MeLog, "You killed", true)
                         console.log("Kill");
                         try {
                             connection.send("kill");
                         } catch (error) {
-                            
+
                         }
-                   }else if(event.name == "match_start"){
-                        this.logLine(this.MeLog,"match started",true)
+                    } else if (event.name == "match_start") {
+                        this.logLine(this.MeLog, "match started", true)
                         console.log("Match_Start");
                         try {
                             connection.send("Started");
                         } catch (error) {
-                            
+
                         }
-                       
-                   }else if(event.name == "match_end"){
-                        this.logLine(this.MeLog,"Match has ended");
+
+                    } else if (event.name == "match_end") {
+                        this.logLine(this.MeLog, "Match has ended");
                         console.log("Match Ended");
                         try {
                             connection.send("match end");
                         } catch (error) {
-                            
+
                         }
-                        
-                   }
+
+                    }
                 });
                 //this.logLine(this._eventsLog, e, shouldHighlight);
             }
@@ -907,17 +935,17 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
             }
         }
 
-        
+
         //let connection = new WebSocket("ws://192.168.1.13:4444");
 
         //let connection = new WebSocket("ws://192.168.1.22:4444")
         var connection;
-    
-    
+
+
         InGame.instance().run();
 
     })();
-    
+
 
     /******/
 })()
