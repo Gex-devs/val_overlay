@@ -46,6 +46,7 @@ message_bytes = message.encode('ascii')
 base64_bytes = base64.b64encode(message_bytes)
 base64_chat = base64_bytes.decode('ascii')
 
+print(base64_chat)
 
 url = f"https://127.0.0.1:{LockFilePort}/entitlements/v1/token"
 
@@ -54,7 +55,7 @@ headers = {"Authorization": f"Basic {base64_chat}"}
 
 try:
     response = requests.request("GET", url, data=payload, headers=headers,verify=False)
-except Exception:
+except Exception: 
     logging.error("Token Request Failed")
 
 logging.info("tokens requested")
@@ -107,6 +108,32 @@ async def broadcast_message(message):
     for ws in connections:
         await ws.send(message)
 
+# Start the websocket server in a separate thread.
+def start_server():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    # Start the request_json task.
+    
+    # Advertise the server using Bonjour.
+    service_info = ServiceInfo(
+    "_http._tcp.local.",
+    f"{get_username(Player_ID)}._http._tcp.local.",
+    address=socket.inet_aton("192.168.1.19"),
+    port=8765,
+    properties={},
+    server="my-web-socket.local.",
+    )
+    
+    #Gex_QR.QR_Code_gen(service_info.addresses,service_info.port,r"C:\Users\dgexi\OneDrive\Documents\Code\Java_script\val_overlay\ts\dist\img\val_logo.jpg")
+
+# Create a Zeroconf object and register the service
+    zeroconf = Zeroconf()
+    zeroconf.register_service(service_info)
+    logging.info("Advertised websocket server")
+    start_server = websockets.serve(echo, "0.0.0.0", 8765,ping_interval=None)
+    logging.info("Server Started")
+    loop.run_until_complete(start_server)
+    loop.run_forever()
 
 
 async def request_json():
@@ -192,32 +219,6 @@ async def request_json():
         # Wait for one second before requesting the JSON data again.
         await asyncio.sleep(1)
       
-# Start the websocket server in a separate thread.
-def start_server():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    # Start the request_json task.
-    
-    # Advertise the server using Bonjour.
-    service_info = ServiceInfo(
-    "_http._tcp.local.",
-    f"{get_username(Player_ID)}._http._tcp.local.",
-    address=socket.inet_aton("192.168.1.19"),
-    port=8765,
-    properties={},
-    server="my-web-socket.local.",
-    )
-    
-    #Gex_QR.QR_Code_gen(service_info.addresses,service_info.port,r"C:\Users\dgexi\OneDrive\Documents\Code\Java_script\val_overlay\ts\dist\img\val_logo.jpg")
-
-# Create a Zeroconf object and register the service
-    zeroconf = Zeroconf()
-    zeroconf.register_service(service_info)
-    logging.info("Advertised websocket server")
-    start_server = websockets.serve(echo, "0.0.0.0", 8765,ping_interval=None)
-    logging.info("Server Started")
-    loop.run_until_complete(start_server)
-    loop.run_forever()
 
 def get_party():
     url = "https://glz-eu-1.eu.a.pvp.net/parties/v1/parties/"+get_party_id()[1]
@@ -228,6 +229,7 @@ def get_party():
     }
     response = requests.request("GET", url, data=payload, headers=headers)
     return response.json()
+
 
 def get_username(PUID):
     url = "https://pd.eu.a.pvp.net/name-service/v2/players"
@@ -541,6 +543,8 @@ def current_game_state():
     pre_game_url = "https://glz-eu-1.eu.a.pvp.net/pregame/v1/players/53f0e053-da42-5fe4-be34-326b738949a4"
 
     pre_game_payload = ""
+
+    # What's the difference between the headers??
     pre_game_headers = {
     "X-Riot-Entitlements-JWT": f"{Entitlment}",
     "Authorization": f"Bearer {Authorization}"
@@ -584,7 +588,6 @@ def get_current_players():
     
 def Temp_Rest_Api():
     app = Flask(__name__) 
-
     @app.route("/current_state")
     def current_state():
         return current_game_state()
@@ -594,6 +597,7 @@ def Temp_Rest_Api():
     @app.route("/get_map")
     def return_map():
         return get_map()
+    
     @app.route("/startQ")
     def start_matchmaking():
         return start_q()

@@ -625,9 +625,7 @@ var plugin = new OverwolfPlugin("process-manager-plugin", true);
                         overwolf.utils.openFilePicker("Pick Main.exe",data =>{
                             this.create_phone_socket("localhost","8765",data.file);
                         })
-                    } else {
-                        
-                    }
+                    } 
                 })
             }
 

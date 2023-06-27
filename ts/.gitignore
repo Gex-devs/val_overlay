@@ -21,3 +21,71 @@ yarn-error.log*
 
 # Overwolf packages
 *.opk
+
+./BackUp_Local_Api_py
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.psess
+*.vssscc
+*.vspscc
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+*.dbmdl
+
+# NuGet Packages
+*.nupkg
+packages/
+*.cache
+*.dll
+*.exe
+
+# Windows Azure build directories
+csx
+bin
+obj
+
+# Other
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+Log
+*.log
+*.opendb
+*.manifest
+*.tlog
+*.cache
+*.VC.opendb
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Resharper files
+_ReSharper*
+
+# GhostDoc plugin files
+~GhostDoc.*
+
+# Other DotNet Core Files
+*.cache
+*.tmp
+*.log
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.userprefs
+.vscode/
+.project
+*.swp
+*.idea/
+.idea
+.vs/

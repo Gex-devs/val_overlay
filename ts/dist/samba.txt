@@ -1,0 +1,9 @@
+[pi]
+path = /home/pi/
+writeable=Yes
+create mask=0777
+directory mask=0777
+public=no
+browsable = yes
+read only = no
+force user = root
